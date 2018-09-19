@@ -215,7 +215,7 @@ data_frame(
   kableExtra::kable_styling(c("striped", "condensed"), full_width = FALSE)
 ```
 
-## Import cells `xlsx_cells()`
+## Step 1: Import cells `xlsx_cells()`
 
 ```{r, message = FALSE, warning = FALSE}
 library(tidyxl)
@@ -230,6 +230,105 @@ yrbs17$character[1:10]
 
 #Cell formatting info is a tibble in the 'character_formatted' column
 yrbs17$character_formatted[[1]]
+```
+
+## Step 2: Find patterns 
+
+- `subgrp1` is in row 3
+- `subgrp2` is in columns (A) B
+- `denominator` is in columns E, I, M
+- `pct` is in columns C, G, K
+- `ci95` is in columns D, H, L
+
+and
+
+- variable names are in row 4
+
+```{r extract-subgrp1}
+#extract subgrp1
+yrbs17 %>% 
+  filter(row == 3) %>% 
+  select(address, row, col, character) %>% 
+  knitr::kable(.) %>% 
+  kableExtra::kable_styling(c("striped", "condensed"), full_width = FALSE)
+```
+
+```{r extract-subgrp2}
+#extract subgrp2
+yrbs17 %>% 
+  filter(col == 2, row > 1) %>% 
+  select(address, row, col, character) %>% 
+  knitr::kable(.) %>% 
+  kableExtra::kable_styling(c("striped", "condensed"), full_width = FALSE)
+```
+
+```{r extract-denominator}
+#extract denominator (pct and ci95 are similar, just shifted one over)
+yrbs17 %>% 
+  filter(col %in% c(5, 9, 13), !is.na(numeric)) %>% #only keep numeric values
+  arrange(col, row) %>%                             #sort rows within columns
+  select(address, row, col, numeric) %>% 
+  knitr::kable(.) %>% 
+  kableExtra::kable_styling(c("striped", "condensed"), full_width = FALSE)
+
+```
+
+## Create a useable data.frame
+
+Now that we have the basics down, we can assemble a data.frame and be sure
+that everything worked correctly.
+
+```{r}
+#Assemble the pieces
+subgrp1 <- yrbs17 %>% 
+  filter(row == 3) %>% 
+  select(col, subgrp1 = character)
+
+#Merged cells are tricky currently
+subgrp1 <- bind_rows(
+  subgrp1,
+  mutate(subgrp1, col = col + 1),
+  mutate(subgrp1, col = col + 2)
+)
+  
+subgrp2 <- yrbs17 %>% 
+  filter(col == 2, row > 1) %>% 
+  select(row, subgrp2 = character)
+
+metric_names <- yrbs17 %>% 
+  filter(row == 4) %>% 
+  mutate(
+    metric_name = case_when(
+      character == "Percentage" ~ "pct",
+      character == "95% confidence interval" ~ "ci95",
+      character == "N" ~ "denominator"
+    )
+  ) %>% 
+  select(col, metric_name)
+
+#In this I have to take that numeric and string contents end up in one column
+metrics <- yrbs17 %>% 
+  filter(col %in% 3:13, row > 4, row != 16) %>%   
+  select(address, row, col, numeric, character) %>% 
+  mutate(
+    value = if_else(is.na(numeric), character, as.character(numeric))
+  ) %>% 
+  select(-numeric, -character)
+
+#Start merging to create a single usable data.frame
+out <- metrics %>% 
+  left_join(metric_names) %>% 
+  left_join(subgrp1) %>% 
+  left_join(subgrp2) %>% 
+  select(subgrp1, subgrp2, metric_name, value) %>%
+  spread(metric_name, value)
+
+out %>% 
+  select(subgrp1, subgrp2, denominator, pct, ci95) %>% 
+  arrange(desc(subgrp1), subgrp2) %>% 
+  knitr::kable(.) %>% 
+  kableExtra::kable_styling(c("striped", "condensed"), full_width = FALSE)
+  
 ```
 
 

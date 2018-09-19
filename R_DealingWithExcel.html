@@ -1921,8 +1921,8 @@ Total
 </tbody>
 </table>
 </div>
-<div id="import-cells-xlsx_cells" class="slide section level2">
-<h1>Import cells <code>xlsx_cells()</code></h1>
+<div id="step-1-import-cells-xlsx_cells" class="slide section level2">
+<h1>Step 1: Import cells <code>xlsx_cells()</code></h1>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">library</span>(tidyxl)</a>
 <a class="sourceLine" id="cb10-2" data-line-number="2">yrbs17 &lt;-<span class="st"> </span><span class="kw">xlsx_cells</span>(<span class="st">&quot;yrbs17_QN9.xlsx&quot;</span>, </a>
 <a class="sourceLine" id="cb10-3" data-line-number="3">                     <span class="dt">sheets =</span> <span class="st">&quot;QN9&quot;</span>,</a>
@@ -1967,6 +1967,1737 @@ Total
 ## # ... with 6 more variables: color_theme &lt;int&gt;, color_indexed &lt;int&gt;,
 ## #   color_tint &lt;dbl&gt;, font &lt;chr&gt;, family &lt;int&gt;, scheme &lt;chr&gt;</code></pre>
 </div>
+<div id="step-2-find-patterns" class="slide section level2">
+<h1>Step 2: Find patterns</h1>
+<ul>
+<li><code>subgrp1</code> is in row 3</li>
+<li><code>subgrp2</code> is in columns (A) B</li>
+<li><code>denominator</code> is in columns E, I, M</li>
+<li><code>pct</code> is in columns C, G, K</li>
+<li><code>ci95</code> is in columns D, H, L</li>
+</ul>
+<p>and</p>
+<ul>
+<li>variable names are in row 4</li>
+</ul>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="co">#extract subgrp1</span></a>
+<a class="sourceLine" id="cb16-2" data-line-number="2">yrbs17 <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-3" data-line-number="3"><span class="st">  </span><span class="kw">filter</span>(row <span class="op">==</span><span class="st"> </span><span class="dv">3</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-4" data-line-number="4"><span class="st">  </span><span class="kw">select</span>(address, row, col, character) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-5" data-line-number="5"><span class="st">  </span>knitr<span class="op">::</span><span class="kw">kable</span>(.) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-6" data-line-number="6"><span class="st">  </span>kableExtra<span class="op">::</span><span class="kw">kable_styling</span>(<span class="kw">c</span>(<span class="st">&quot;striped&quot;</span>, <span class="st">&quot;condensed&quot;</span>), <span class="dt">full_width =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<table class="table table-striped table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+address
+</th>
+<th style="text-align:right;">
+row
+</th>
+<th style="text-align:right;">
+col
+</th>
+<th style="text-align:left;">
+character
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+C3
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Total
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+G3
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:left;">
+Male
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+K3
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:left;">
+Female
+</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="co">#extract subgrp2</span></a>
+<a class="sourceLine" id="cb17-2" data-line-number="2">yrbs17 <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-3" data-line-number="3"><span class="st">  </span><span class="kw">filter</span>(col <span class="op">==</span><span class="st"> </span><span class="dv">2</span>, row <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-4" data-line-number="4"><span class="st">  </span><span class="kw">select</span>(address, row, col, character) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-5" data-line-number="5"><span class="st">  </span>knitr<span class="op">::</span><span class="kw">kable</span>(.) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-6" data-line-number="6"><span class="st">  </span>kableExtra<span class="op">::</span><span class="kw">kable_styling</span>(<span class="kw">c</span>(<span class="st">&quot;striped&quot;</span>, <span class="st">&quot;condensed&quot;</span>), <span class="dt">full_width =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<table class="table table-striped table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+address
+</th>
+<th style="text-align:right;">
+row
+</th>
+<th style="text-align:right;">
+col
+</th>
+<th style="text-align:left;">
+character
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+B6
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Total
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B8
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+15 or younger
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B9
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+16 or 17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B10
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+18 or older
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B12
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+9th
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+10th
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+11th
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B15
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+12th
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B17
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Asian*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B18
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Black*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B19
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Hispanic/Latino
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B20
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+White*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B21
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+All other races*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B22
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Multiple races*
+</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="co">#extract denominator (pct and ci95 are similar, just shifted one over)</span></a>
+<a class="sourceLine" id="cb18-2" data-line-number="2">yrbs17 <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="st">  </span><span class="kw">filter</span>(col <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">13</span>), <span class="op">!</span><span class="kw">is.na</span>(numeric)) <span class="op">%&gt;%</span><span class="st"> </span><span class="co">#only keep numeric values</span></a>
+<a class="sourceLine" id="cb18-4" data-line-number="4"><span class="st">  </span><span class="kw">arrange</span>(col, row) <span class="op">%&gt;%</span><span class="st">                             </span><span class="co">#sort rows within columns</span></a>
+<a class="sourceLine" id="cb18-5" data-line-number="5"><span class="st">  </span><span class="kw">select</span>(address, row, col, numeric) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb18-6" data-line-number="6"><span class="st">  </span>knitr<span class="op">::</span><span class="kw">kable</span>(.) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb18-7" data-line-number="7"><span class="st">  </span>kableExtra<span class="op">::</span><span class="kw">kable_styling</span>(<span class="kw">c</span>(<span class="st">&quot;striped&quot;</span>, <span class="st">&quot;condensed&quot;</span>), <span class="dt">full_width =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<table class="table table-striped table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+address
+</th>
+<th style="text-align:right;">
+row
+</th>
+<th style="text-align:right;">
+col
+</th>
+<th style="text-align:right;">
+numeric
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+E6
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+2048
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E8
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+709
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E9
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+1062
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E10
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+276
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E12
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+480
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E13
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+540
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E14
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+551
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E15
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+456
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E17
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+68
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E18
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+123
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E19
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+250
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E20
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+1437
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E21
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+26
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E22
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+103
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+I6
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+1105
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+I8
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+346
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+I9
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+513
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+I10
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+156
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+I12
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+242
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+I13
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+267
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+I14
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+255
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+I15
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+238
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+I17
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+31
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+I18
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+65
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+I19
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+129
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+I20
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+701
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+I21
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+18
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+I22
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+48
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+M6
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+1018
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+M8
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+356
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+M9
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+545
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+M10
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+117
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+M12
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+232
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+M13
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+271
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+M14
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+295
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+M15
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+216
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+M17
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+35
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+M18
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+57
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+M19
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+117
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+M20
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+733
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+M21
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+M22
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+55
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="create-a-useable-data.frame" class="slide section level2">
+<h1>Create a useable data.frame</h1>
+<p>Now that we have the basics down, we can assemble a data.frame and be sure that everything worked correctly.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="co">#Assemble the pieces</span></a>
+<a class="sourceLine" id="cb19-2" data-line-number="2">subgrp1 &lt;-<span class="st"> </span>yrbs17 <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-3" data-line-number="3"><span class="st">  </span><span class="kw">filter</span>(row <span class="op">==</span><span class="st"> </span><span class="dv">3</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-4" data-line-number="4"><span class="st">  </span><span class="kw">select</span>(col, <span class="dt">subgrp1 =</span> character)</a>
+<a class="sourceLine" id="cb19-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb19-6" data-line-number="6"><span class="co">#Merged cells are tricky currently</span></a>
+<a class="sourceLine" id="cb19-7" data-line-number="7">subgrp1 &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(</a>
+<a class="sourceLine" id="cb19-8" data-line-number="8">  subgrp1,</a>
+<a class="sourceLine" id="cb19-9" data-line-number="9">  <span class="kw">mutate</span>(subgrp1, <span class="dt">col =</span> col <span class="op">+</span><span class="st"> </span><span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb19-10" data-line-number="10">  <span class="kw">mutate</span>(subgrp1, <span class="dt">col =</span> col <span class="op">+</span><span class="st"> </span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb19-11" data-line-number="11">)</a>
+<a class="sourceLine" id="cb19-12" data-line-number="12">  </a>
+<a class="sourceLine" id="cb19-13" data-line-number="13">subgrp2 &lt;-<span class="st"> </span>yrbs17 <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-14" data-line-number="14"><span class="st">  </span><span class="kw">filter</span>(col <span class="op">==</span><span class="st"> </span><span class="dv">2</span>, row <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-15" data-line-number="15"><span class="st">  </span><span class="kw">select</span>(row, <span class="dt">subgrp2 =</span> character)</a>
+<a class="sourceLine" id="cb19-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb19-17" data-line-number="17">metric_names &lt;-<span class="st"> </span>yrbs17 <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-18" data-line-number="18"><span class="st">  </span><span class="kw">filter</span>(row <span class="op">==</span><span class="st"> </span><span class="dv">4</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-19" data-line-number="19"><span class="st">  </span><span class="kw">mutate</span>(</a>
+<a class="sourceLine" id="cb19-20" data-line-number="20">    <span class="dt">metric_name =</span> <span class="kw">case_when</span>(</a>
+<a class="sourceLine" id="cb19-21" data-line-number="21">      character <span class="op">==</span><span class="st"> &quot;Percentage&quot;</span> <span class="op">~</span><span class="st"> &quot;pct&quot;</span>,</a>
+<a class="sourceLine" id="cb19-22" data-line-number="22">      character <span class="op">==</span><span class="st"> &quot;95% confidence interval&quot;</span> <span class="op">~</span><span class="st"> &quot;ci95&quot;</span>,</a>
+<a class="sourceLine" id="cb19-23" data-line-number="23">      character <span class="op">==</span><span class="st"> &quot;N&quot;</span> <span class="op">~</span><span class="st"> &quot;denominator&quot;</span></a>
+<a class="sourceLine" id="cb19-24" data-line-number="24">    )</a>
+<a class="sourceLine" id="cb19-25" data-line-number="25">  ) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-26" data-line-number="26"><span class="st">  </span><span class="kw">select</span>(col, metric_name)</a>
+<a class="sourceLine" id="cb19-27" data-line-number="27"></a>
+<a class="sourceLine" id="cb19-28" data-line-number="28"><span class="co">#In this I have to take that numeric and string contents end up in one column</span></a>
+<a class="sourceLine" id="cb19-29" data-line-number="29">metrics &lt;-<span class="st"> </span>yrbs17 <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-30" data-line-number="30"><span class="st">  </span><span class="kw">filter</span>(col <span class="op">%in%</span><span class="st"> </span><span class="dv">3</span><span class="op">:</span><span class="dv">13</span>, row <span class="op">&gt;</span><span class="st"> </span><span class="dv">4</span>, row <span class="op">!=</span><span class="st"> </span><span class="dv">16</span>) <span class="op">%&gt;%</span><span class="st">   </span></a>
+<a class="sourceLine" id="cb19-31" data-line-number="31"><span class="st">  </span><span class="kw">select</span>(address, row, col, numeric, character) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-32" data-line-number="32"><span class="st">  </span><span class="kw">mutate</span>(</a>
+<a class="sourceLine" id="cb19-33" data-line-number="33">    <span class="dt">value =</span> <span class="kw">if_else</span>(<span class="kw">is.na</span>(numeric), character, <span class="kw">as.character</span>(numeric))</a>
+<a class="sourceLine" id="cb19-34" data-line-number="34">  ) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-35" data-line-number="35"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>numeric, <span class="op">-</span>character)</a>
+<a class="sourceLine" id="cb19-36" data-line-number="36"></a>
+<a class="sourceLine" id="cb19-37" data-line-number="37"><span class="co">#Start merging to create a single usable data.frame</span></a>
+<a class="sourceLine" id="cb19-38" data-line-number="38">out &lt;-<span class="st"> </span>metrics <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-39" data-line-number="39"><span class="st">  </span><span class="kw">left_join</span>(metric_names) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-40" data-line-number="40"><span class="st">  </span><span class="kw">left_join</span>(subgrp1) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-41" data-line-number="41"><span class="st">  </span><span class="kw">left_join</span>(subgrp2) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-42" data-line-number="42"><span class="st">  </span><span class="kw">select</span>(subgrp1, subgrp2, metric_name, value) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb19-43" data-line-number="43"><span class="st">  </span><span class="kw">spread</span>(metric_name, value)</a></code></pre></div>
+<pre><code>## Joining, by = &quot;col&quot;
+## Joining, by = &quot;col&quot;</code></pre>
+<pre><code>## Joining, by = &quot;row&quot;</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">out <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb22-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(subgrp1, subgrp2, denominator, pct, ci95) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb22-3" data-line-number="3"><span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(subgrp1), subgrp2) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb22-4" data-line-number="4"><span class="st">  </span>knitr<span class="op">::</span><span class="kw">kable</span>(.) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb22-5" data-line-number="5"><span class="st">  </span>kableExtra<span class="op">::</span><span class="kw">kable_styling</span>(<span class="kw">c</span>(<span class="st">&quot;striped&quot;</span>, <span class="st">&quot;condensed&quot;</span>), <span class="dt">full_width =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<table class="table table-striped table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+subgrp1
+</th>
+<th style="text-align:left;">
+subgrp2
+</th>
+<th style="text-align:left;">
+denominator
+</th>
+<th style="text-align:left;">
+pct
+</th>
+<th style="text-align:left;">
+ci95
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+10th
+</td>
+<td style="text-align:left;">
+540
+</td>
+<td style="text-align:left;">
+16.7
+</td>
+<td style="text-align:left;">
+( 14.2 - 19.7 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+11th
+</td>
+<td style="text-align:left;">
+551
+</td>
+<td style="text-align:left;">
+14.1
+</td>
+<td style="text-align:left;">
+( 10.2 - 19.3 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+12th
+</td>
+<td style="text-align:left;">
+456
+</td>
+<td style="text-align:left;">
+18.9
+</td>
+<td style="text-align:left;">
+( 14.2 - 24.7 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+15 or younger
+</td>
+<td style="text-align:left;">
+709
+</td>
+<td style="text-align:left;">
+18.7
+</td>
+<td style="text-align:left;">
+( 15.8 - 21.9 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+16 or 17
+</td>
+<td style="text-align:left;">
+1062
+</td>
+<td style="text-align:left;">
+16.1
+</td>
+<td style="text-align:left;">
+( 13.2 - 19.5 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+18 or older
+</td>
+<td style="text-align:left;">
+276
+</td>
+<td style="text-align:left;">
+18.6
+</td>
+<td style="text-align:left;">
+( 12.3 - 27.1 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+9th
+</td>
+<td style="text-align:left;">
+480
+</td>
+<td style="text-align:left;">
+19.5
+</td>
+<td style="text-align:left;">
+( 15.4 - 24.3 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+All other races*
+</td>
+<td style="text-align:left;">
+26
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+Asian*
+</td>
+<td style="text-align:left;">
+68
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+Black*
+</td>
+<td style="text-align:left;">
+123
+</td>
+<td style="text-align:left;">
+19.3
+</td>
+<td style="text-align:left;">
+( 13.8 - 26.2 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+Hispanic/Latino
+</td>
+<td style="text-align:left;">
+250
+</td>
+<td style="text-align:left;">
+18.9
+</td>
+<td style="text-align:left;">
+( 12.9 - 26.9 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+Multiple races*
+</td>
+<td style="text-align:left;">
+103
+</td>
+<td style="text-align:left;">
+18.8
+</td>
+<td style="text-align:left;">
+( 12.0 - 28.2 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+2048
+</td>
+<td style="text-align:left;">
+17.4
+</td>
+<td style="text-align:left;">
+( 15.3 - 19.7 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+White*
+</td>
+<td style="text-align:left;">
+1437
+</td>
+<td style="text-align:left;">
+16.6
+</td>
+<td style="text-align:left;">
+( 14.5 - 19.1 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+10th
+</td>
+<td style="text-align:left;">
+267
+</td>
+<td style="text-align:left;">
+19.9
+</td>
+<td style="text-align:left;">
+( 16.0 - 24.4 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+11th
+</td>
+<td style="text-align:left;">
+255
+</td>
+<td style="text-align:left;">
+10.4
+</td>
+<td style="text-align:left;">
+( 5.5 - 18.8 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+12th
+</td>
+<td style="text-align:left;">
+238
+</td>
+<td style="text-align:left;">
+19.5
+</td>
+<td style="text-align:left;">
+( 12.5 - 29.1 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+15 or younger
+</td>
+<td style="text-align:left;">
+346
+</td>
+<td style="text-align:left;">
+19.5
+</td>
+<td style="text-align:left;">
+( 16.1 - 23.4 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+16 or 17
+</td>
+<td style="text-align:left;">
+513
+</td>
+<td style="text-align:left;">
+14.9
+</td>
+<td style="text-align:left;">
+( 11.0 - 19.8 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+18 or older
+</td>
+<td style="text-align:left;">
+156
+</td>
+<td style="text-align:left;">
+20.1
+</td>
+<td style="text-align:left;">
+( 12.2 - 31.2 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+9th
+</td>
+<td style="text-align:left;">
+242
+</td>
+<td style="text-align:left;">
+19.4
+</td>
+<td style="text-align:left;">
+( 14.6 - 25.2 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+All other races*
+</td>
+<td style="text-align:left;">
+18
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+Asian*
+</td>
+<td style="text-align:left;">
+31
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+Black*
+</td>
+<td style="text-align:left;">
+65
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+Hispanic/Latino
+</td>
+<td style="text-align:left;">
+129
+</td>
+<td style="text-align:left;">
+15.5
+</td>
+<td style="text-align:left;">
+( 7.8 - 28.5 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+Multiple races*
+</td>
+<td style="text-align:left;">
+48
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+1105
+</td>
+<td style="text-align:left;">
+17.3
+</td>
+<td style="text-align:left;">
+( 14.3 - 20.8 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+White*
+</td>
+<td style="text-align:left;">
+701
+</td>
+<td style="text-align:left;">
+16.6
+</td>
+<td style="text-align:left;">
+( 13.4 - 20.5 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+10th
+</td>
+<td style="text-align:left;">
+271
+</td>
+<td style="text-align:left;">
+13.6
+</td>
+<td style="text-align:left;">
+( 9.7 - 18.7 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+11th
+</td>
+<td style="text-align:left;">
+295
+</td>
+<td style="text-align:left;">
+18.1
+</td>
+<td style="text-align:left;">
+( 13.4 - 23.8 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+12th
+</td>
+<td style="text-align:left;">
+216
+</td>
+<td style="text-align:left;">
+18.4
+</td>
+<td style="text-align:left;">
+( 14.7 - 22.7 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+15 or younger
+</td>
+<td style="text-align:left;">
+356
+</td>
+<td style="text-align:left;">
+17.2
+</td>
+<td style="text-align:left;">
+( 12.9 - 22.6 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+16 or 17
+</td>
+<td style="text-align:left;">
+545
+</td>
+<td style="text-align:left;">
+17.1
+</td>
+<td style="text-align:left;">
+( 13.2 - 21.8 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+18 or older
+</td>
+<td style="text-align:left;">
+117
+</td>
+<td style="text-align:left;">
+17.1
+</td>
+<td style="text-align:left;">
+( 11.1 - 25.3 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+9th
+</td>
+<td style="text-align:left;">
+232
+</td>
+<td style="text-align:left;">
+18.5
+</td>
+<td style="text-align:left;">
+( 13.5 - 24.7 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+All other races*
+</td>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+Asian*
+</td>
+<td style="text-align:left;">
+35
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+Black*
+</td>
+<td style="text-align:left;">
+57
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+Hispanic/Latino
+</td>
+<td style="text-align:left;">
+117
+</td>
+<td style="text-align:left;">
+21.8
+</td>
+<td style="text-align:left;">
+( 13.9 - 32.5 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+Multiple races*
+</td>
+<td style="text-align:left;">
+55
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+1018
+</td>
+<td style="text-align:left;">
+17.1
+</td>
+<td style="text-align:left;">
+( 14.7 - 19.9 )
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+White*
+</td>
+<td style="text-align:left;">
+733
+</td>
+<td style="text-align:left;">
+16.7
+</td>
+<td style="text-align:left;">
+( 14.3 - 19.4 )
+</td>
+</tr>
+</tbody>
+</table></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
 <div id="writing-.xlsx-files-from-r" class="slide section level2">
 <h1>Writing .xlsx files from R</h1>
 <p>openxlsx example for one, then many sheets per file</p>
@@ -2010,7 +3741,7 @@ Total
 </div>
 <div id="session_info" class="slide section level2">
 <h1>session_info()</h1>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">devtools<span class="op">::</span><span class="kw">session_info</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">devtools<span class="op">::</span><span class="kw">session_info</span>()</a></code></pre></div>
 <pre><code>## Session info -------------------------------------------------------------</code></pre>
 <pre><code>##  setting  value                       
 ##  version  R version 3.5.0 (2018-04-23)
@@ -2019,7 +3750,7 @@ Total
 ##  language (EN)                        
 ##  collate  English_United States.1252  
 ##  tz       America/Chicago             
-##  date     2018-09-17</code></pre>
+##  date     2018-09-19</code></pre>
 <pre><code>## Packages -----------------------------------------------------------------</code></pre>
 <pre><code>##  package     * version    date       source                         
 ##  assertthat    0.2.0      2017-04-11 CRAN (R 3.5.0)                 
