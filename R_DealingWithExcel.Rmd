@@ -32,17 +32,19 @@ library(emo)
  2. Focus on strategies for working with spreadsheets that are optimized for 
     human readability instead of machine readability.
     
+<div style = "background-color: lightblue">    
 **Goal**
 
 *You will remember there is a way to do this in R and this presentation can 
 be a reference/recipe when you need it.*
+</div>
     
 </div>
 
 ## R packages that interact with Excel
 
-The R-Data Import/Export Manual has a "[chapter]()" about interacting with 
-Excel. 
+The R-Data Import/Export Manual has a "[chapter](https://cran.r-project.org/doc/manuals/r-release/R-data.html#Reading-Excel-spreadsheets)" 
+about interacting with Excel. 
 
 >"The first piece of advice is to avoid doing so if possible!"
 
@@ -111,6 +113,18 @@ data_frame(
   kableExtra::group_rows("Others I've Used", 4, 5) %>% 
   kableExtra::group_rows("Haven't Used", 6, 10) 
 ```
+
+## Importing Data
+<style>
+  .center {
+    margin: auto;
+    width: 50%
+  }
+</style>
+
+<div class="center"> 
+![https://xkcd.com/1906/](https://imgs.xkcd.com/comics/making_progress.png)
+</div>
 
 ## Import from Excel: Machine Friendly Files 
 
@@ -273,12 +287,12 @@ yrbs17 %>%
 
 ```
 
-## Create a useable data.frame
+## Step 3: Create a useable data.frame
 
 Now that we have the basics down, we can assemble a data.frame and be sure
 that everything worked correctly.
 
-```{r}
+```{r assemble-data-frame}
 #Assemble the pieces
 subgrp1 <- yrbs17 %>% 
   filter(row == 3) %>% 
@@ -331,10 +345,136 @@ out %>%
   
 ```
 
+## Is it worth it?
 
-## Writing .xlsx files from R
+You may be thinking:
 
-openxlsx example for one, then many sheets per file
+>Gosh, is all that complexity worth it? I could have just cut and 
+paste in Excel to get the data to behave well in `R`?
+
+That is a valid question, and one I had before diving in to this package. The
+answer is that if it is a one-off project it probably isn't worth it.
+
+**Two reasons why (and under what circumstances) you should consider it:**
+
+1. You will have to import this kind of table a lot ... either at one time or 
+   regularly in the future. In this case, I would incorporate the data 
+   processing steps into a function.
+2. You want to be sure to avoid copy/paste errors. Merging by row and/or column
+   location ensures you don't accidentally shift things, copy over existing 
+   rows, etc. This allows for more reproducible results because you don't 
+   alter the original (source) data.
+
+## Bonus: Checking for spreadsheet smells   
+
+<style>
+.footer {
+    color: black; 
+    background: #E8E8E8;
+    top: 76%;
+    text-align:left; 
+    width:100%;
+    fontsize: x-small;
+}
+</style>
+
+Ever worry that the spreadsheet someone sent you was not as trustworthy as 
+you would like? It was likely a smelly spreadsheet.* Smelly spreadsheets 
+don't necessarily indicate errors ... their complexity just makes it harder
+to maintain and more likely to introduce errors.**
+
+Common spreadsheet smells refer to complicated formulas in cells and include: 
+
+- Multiple Operations
+- **Multiple References**
+- **Conditional Complexity**
+- Long Calculation Chain
+- **Duplicated Formulas**
+
+`tidyxl::xlex()` is a function that offers ways to identify potential
+spreadsheet smells in these spreadsheets.
+
+<div class = "footer">
+
+*The term comes from code smells (https://en.wikipedia.org/wiki/Code_smell)
+and was ported to the spreadsheet realm by Felienne Hermans et al 
+([this paper](http://swerl.tudelft.nl/twiki/pub/FelienneHermans/Publications/paper_camera_ready.pdf),
+[this paper](http://swerl.tudelft.nl/twiki/pub/FelienneHermans/Publications/TUD-SERG-2011-030.pdf),
+[or this paper](http://www.fast-standard.org/wp-content/uploads/2017/08/Jansen-B.-and-Hermans-F.-2015.-Code-Smells-in-Spreadsheet-Formulas-Revisited-on-an-Industrial-Dataset.pdf.))
+
+**There is even at least one set of standards for constructing non-smelly 
+spreadsheets <http://www.fast-standard.org/>.
+
+</div>
+
+## Exporting Data
+
+<div class = "center">
+<div class="tumblr-post" data-href="https://embed.tumblr.com/embed/post/R_5eR06UqopXPglMaNErlA/156949714637" data-did="55e6e6d722c823fcd2d41bba7a54be00fc226304"><a href="https://redpenblackpen.tumblr.com/post/156949714637/why-do-i-use-so-much-excel">https://redpenblackpen.tumblr.com/post/156949714637/why-do-i-use-so-much-excel</a></div>  <script async src="https://assets.tumblr.com/post.js"></script>
+</div>
+
+## Super Basic Export: .csv
+
+The easiest way to export data from R that is accessible in excel is in
+comma separated values (.csv) format with 
+
+- `write.csv()` or
+- `readr::write_csv()` if you're a fan of the tidyverse
+
+in my opinion, the latter has nicer defaults (not printing rownames/numbers).
+
+## Basic Export 1: `openxlsx`
+
+**Single Data Frame**
+
+```{r export-single}
+#Using the iris data
+write.xlsx(iris, file = file.path(tdir, "iris.xlsx"))
+
+dir(tdir, pattern = "*.xlsx")
+```
+
+![](images/iris_view.png)
+
+## Basic Export 2: `openxlsx`
+
+**Multiple Data Frames**
+
+If you need to write multiple data.frames to a single excel file, you just
+supply a list of data.frames. If the list is named, the worksheet names will
+equal the list names.
+
+```{r export-multiple}
+#Lets create an Excel file with all the ggplot2 datasets.
+gg2dfs <- data(package = "ggplot2")$results
+gg2dfs[,3:4]
+
+#Quick and dirty way to turn the above into a named list of data.frames
+out <- lapply(1:nrow(gg2dfs), function(x) eval(as.symbol(gg2dfs[x, "Item"])))
+names(out) <- sapply(1:nrow(gg2dfs), function(x) gg2dfs[x, "Item"])
+
+write.xlsx(out, file.path(tdir, "ggplot2_datasets.xlsx"))
+
+dir(tdir, pattern = ".xlsx")
+
+```
+
+![](images/ggplot2_view.png)
+
+## Advanced Export
+
+Theoretically you could move from a tidy data.frame to a human friendly 
+spreadheet using the `XLConnect` and/or `xlsx` packages.
+
+This may be helpful if you are designing canned reports that rely on some R
+interaction.
+
+I am too lazy to learn the details, so here are links to the relevant 
+documentation
+
+- `xlsx`: see `?createWorkbook` and all the referenced help files
+- `XLconnect`: see <https://cran.r-project.org/web/packages/XLConnect/vignettes/XLConnect.pdf> 
+   for a 19 page manual.
 
 ## Other packages related to Excel
 
